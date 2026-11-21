@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aurelia Motors Production – CEO Portal</title>
+<style>
+:root{--bg:#e9ebee;--sf:#f8f9fa;--ink:#151a24;--mut:#5b6573;--ln:#d2d7de;--ac:#9b1c2e;--aci:#fff;--side:#1a2230;--sidei:#e8ecf2;--ok:#1d7a4a;--wn:#a86a00;--bd:#b3261e}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f131a;--sf:#171d27;--ink:#e8ecf2;--mut:#97a2b2;--ln:#273040;--ac:#ff7f8f;--aci:#2a0710;--side:#0a0d13;--ok:#5cc58f;--wn:#e0a63a;--bd:#ff8a80}}
+:root[data-theme=dark]{--bg:#0f131a;--sf:#171d27;--ink:#e8ecf2;--mut:#97a2b2;--ln:#273040;--ac:#ff7f8f;--aci:#2a0710;--side:#0a0d13;--ok:#5cc58f;--wn:#e0a63a;--bd:#ff8a80}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0;line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.btn{background:var(--ac);color:var(--aci);border:0;border-radius:6px;padding:9px 16px;font-weight:600}
+.btn.g{background:none;color:var(--ink);border:1px solid var(--ln)}
+input,select,textarea{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:10px;width:100%}
+#login{min-height:100%;display:grid;grid-template-columns:1.1fr 1fr}
+.lv{background:var(--side);color:var(--sidei);padding:56px;display:flex;flex-direction:column;justify-content:space-between;gap:30px}
+.lv h1{font-size:clamp(2.2rem,5vw,3.8rem);letter-spacing:-.02em;max-width:14ch}
+.lv p{max-width:46ch;opacity:.8}
+.lf{display:grid;place-items:center;padding:32px}
+.lf form{width:100%;max-width:380px;display:grid;gap:14px}
+.lf label{display:grid;gap:6px;font-weight:600;font-size:.92rem}
+.hint{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:12px;font-size:.88rem;color:var(--mut)}
+.err{color:var(--bd);min-height:1.3em;font-size:.9rem}
+#app{display:none;height:100%;grid-template-columns:210px 1fr}
+aside{background:var(--side);color:var(--sidei);padding:18px 12px;display:flex;flex-direction:column;gap:3px;overflow:auto}
+aside .lg{font:700 1.1rem Georgia,serif;padding:6px 10px 16px}
+.tab{background:none;border:0;text-align:left;padding:10px 12px;border-radius:6px;color:inherit;display:flex;justify-content:space-between;align-items:center;opacity:.8}
+.tab:hover{opacity:1;background:#ffffff14}
+.tab[aria-selected=true]{opacity:1;background:var(--ac);color:var(--aci)}
+aside .bot{margin-top:auto;display:grid;gap:8px;padding:10px;font-size:.85rem}
+aside .bot button{background:none;border:1px solid #ffffff40;border-radius:6px;color:inherit;padding:6px}
+.badge{background:var(--bd);color:#fff;border-radius:99px;padding:0 8px;font-size:.76rem;display:none}
+main{overflow:auto;padding:20px 24px;min-width:0}
+.clk{display:flex;gap:18px;flex-wrap:wrap;font-size:.84rem;color:var(--mut);padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--ln)}
+.clk b{color:var(--ink);font-weight:600}
+.top{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.top h2{font-size:1.8rem}.top span{color:var(--mut)}
+.pane{display:none}.pane.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi,.card{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:16px}
+.kpi b{display:block;font:700 1.7rem Georgia,serif}.kpi span{color:var(--mut);font-size:.88rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card h3{font-size:1.2rem;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--ln)}
+.row:first-of-type{border-top:0}
+small,.row small{color:var(--mut);display:block}
+.bar{height:8px;background:var(--ln);border-radius:9px;overflow:hidden;min-width:90px}.bar i{display:block;height:100%;background:var(--ac)}
+.tw{overflow-x:auto;background:var(--sf);border:1px solid var(--ln);border-radius:8px;margin-bottom:20px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--ln)}th{color:var(--mut);font-size:.85rem}tr:last-child td{border:0}
+.st{font-weight:600}.Normal,.Delivered,.ok{color:var(--ok)}.Delay,.Transit{color:var(--wn)}.Alert,.bad{color:var(--bd)}
+/* schedule */
+.days{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.days button{background:var(--sf);border:1px solid var(--ln);border-radius:99px;padding:6px 16px}
+.days button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ev{display:grid;grid-template-columns:90px 1fr auto;gap:12px;padding:14px 0;border-top:1px solid var(--ln);align-items:center}
+.ev:first-child{border-top:0}
+.ev .tm{font:700 1.05rem Georgia,serif}
+.ev.done .et{text-decoration:line-through;opacity:.5}
+.tag{display:inline-block;border:1px solid var(--ln);border-radius:99px;padding:0 10px;font-size:.78rem;color:var(--mut);margin-left:6px}
+.sf{display:grid;grid-template-columns:130px 1fr 1fr 150px;gap:10px;align-items:end}
+.sf label{display:grid;gap:4px;font-size:.84rem;font-weight:600}
+.sf .ck{grid-column:1/4;display:flex;gap:8px;align-items:center;font-weight:400}.sf .ck input{width:auto}
+/* chat */
+.chat{display:grid;grid-template-columns:270px 1fr;background:var(--sf);border:1px solid var(--ln);border-radius:8px;overflow:hidden;height:calc(100vh - 235px);height:calc(100dvh - 235px);min-height:380px;grid-template-rows:minmax(0,1fr)}
+.cl{border-right:1px solid var(--ln);overflow:auto}
+.cp{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--ln);padding:12px 14px;gap:8px}
+.cp[aria-selected=true]{background:var(--bg);box-shadow:inset 3px 0 var(--ac)}
+.cp b,.cp small{display:block}
+.cp small{font-size:.8rem}
+.ct{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%}
+.ch{padding:12px 16px;border-bottom:1px solid var(--ln)}
+.cm{flex:1;min-height:0;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.b{max-width:76%;white-space:pre-wrap;overflow-wrap:anywhere;padding:9px 12px;border-radius:12px;background:var(--bg)}
+.b.me{align-self:flex-end;background:var(--ac);color:var(--aci)}
+.b small{font-size:.74rem;opacity:.75;color:inherit}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 8px}
+.chip{background:none;border:1px solid var(--ln);border-radius:99px;padding:4px 12px;font-size:.85rem}
+.cf{display:flex;gap:8px;padding:12px;border-top:1px solid var(--ln);align-items:flex-end;flex-shrink:0;background:var(--sf)}
+.cf textarea{flex:1;resize:none;min-height:42px;max-height:160px;line-height:1.4}
+.chips{flex-shrink:0}.ch{flex-shrink:0}
+/* mail */
+.mail{display:grid;grid-template-columns:150px 310px 1fr;background:var(--sf);border:1px solid var(--ln);border-radius:8px;overflow:hidden;height:calc(100vh - 235px);height:calc(100dvh - 235px);min-height:380px;grid-template-rows:minmax(0,1fr)}
+.fold{border-right:1px solid var(--ln);padding:10px;display:flex;flex-direction:column;gap:2px;overflow:auto}
+.fold button{background:none;border:0;text-align:left;padding:7px 10px;border-radius:6px}
+.fold button[aria-pressed=true]{background:var(--bg);font-weight:700}
+.fold h4{margin:12px 10px 4px;font-size:.78rem;color:var(--mut)}
+.ml{border-right:1px solid var(--ln);overflow:auto}
+.mi{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--ln);padding:12px 14px}
+.mi[aria-selected=true]{background:var(--bg);box-shadow:inset 3px 0 var(--ac)}
+.mi strong,.mi span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mi span{color:var(--mut);font-size:.86rem}
+.mi.u strong::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ac);margin-right:7px}
+.rd{padding:20px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.rd h3{font-size:1.35rem}.mt{color:var(--mut);font-size:.88rem}
+.acts{display:flex;gap:8px;flex-wrap:wrap}.cmp{display:grid;gap:10px}
+.cmp label{display:grid;gap:4px;font-weight:600;font-size:.9rem}
+.toast{color:var(--ok);min-height:1.3em;font-size:.9rem}
+@media(max-width:900px){#login{grid-template-columns:1fr}.lv{padding:32px}
+#app{grid-template-columns:1fr;grid-template-rows:auto 1fr}aside{flex-direction:row;overflow-x:auto;padding:8px}aside .lg,aside .bot{display:none}.tab{white-space:nowrap;gap:8px}
+.kpis{grid-template-columns:1fr 1fr}.two{grid-template-columns:1fr}.sf{grid-template-columns:1fr 1fr}.sf .ck{grid-column:1/3}
+.chat,.mail{grid-template-columns:1fr;height:auto}.chat .ct{height:70vh}.cl{max-height:200px;border-right:0;border-bottom:1px solid var(--ln)}
+.fold{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--ln)}.fold h4{display:none}.ml{max-height:240px;border-right:0;border-bottom:1px solid var(--ln)}.ev{grid-template-columns:70px 1fr}.ev .acts{grid-column:1/3}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <section class="lv">
+    <strong style="font:700 1.2rem Georgia,serif">Aurelia Motors Production</strong>
+    <div>
+      <h1>One desk for every plant, market and department.</h1>
+      <p>Head office in Chennai, six plants in four countries. Sign in to plan your day, write to your PA, plant heads and department heads, and approve decisions.</p>
+    </div>
+    <small style="opacity:.6">Authorised executives only</small>
+  </section>
+  <section class="lf">
+    <form id="lform">
+      <h2 style="font-size:1.8rem">CEO sign in</h2>
+      <label>Work email<input id="em" type="email" autocomplete="off" value="ceo@aureliamotors.com" required></label>
+      <label>Password<input id="pw" type="text" autocomplete="off" value="ceo@123" required></label>
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn" type="submit">Sign in</button>
+      <div class="hint">Demo login (already filled in, just press Sign in):<br>Email: <b>ceo@aureliamotors.com</b><br>Password: <b>ceo@123</b><br>This check runs in your browser only, so it is a demo and not real security.</div>
+    </form>
+  </section>
+</div>
+
+<div id="app">
+  <aside role="tablist" aria-label="Sections">
+    <div class="lg">Aurelia Motors</div>
+    <button class="tab" role="tab" data-t="over" aria-selected="true">Overview</button>
+    <button class="tab" role="tab" data-t="sch" aria-selected="false">Schedule</button>
+    <button class="tab" role="tab" data-t="pa" aria-selected="false">My PA <span class="badge" id="b-pa"></span></button>
+    <button class="tab" role="tab" data-t="pl" aria-selected="false">Plant heads <span class="badge" id="b-pl"></span></button>
+    <button class="tab" role="tab" data-t="ho" aria-selected="false">Head office <span class="badge" id="b-ho"></span></button>
+    <button class="tab" role="tab" data-t="mail" aria-selected="false">Mail <span class="badge" id="b-mail"></span></button>
+    <button class="tab" role="tab" data-t="ops" aria-selected="false">Plants and deliveries</button>
+    <button class="tab" role="tab" data-t="sh" aria-selected="false">Shareholders</button>
+    <div class="bot"><span>Rohan Mehta<br>Chairman and CEO</span><button id="theme">Theme</button><button id="out">Sign out</button><button id="reset">Reset demo data</button></div>
+  </aside>
+  <main>
+    <div class="clk" id="clk" aria-label="Local time at each location"></div>
+
+    <section class="pane on" id="p-over">
+      <div class="top"><h2>Good day, Rohan</h2><span id="date"></span></div>
+      <div class="kpis">
+        <div class="kpi"><b id="k1">0</b><span>Cars built today</span></div>
+        <div class="kpi"><b>2,970</b><span>Cars shipped this week</span></div>
+        <div class="kpi"><b id="k3">0</b><span>Meetings left today</span></div>
+        <div class="kpi"><b id="k4">0</b><span>Decisions awaiting you</span></div>
+      </div>
+      <div class="two">
+        <div class="card"><h3>Next on your schedule</h3><div id="nx"></div></div>
+        <div class="card"><h3>Approvals</h3><div id="appr"></div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><h3>Plant output today</h3><div id="ob"></div></div>
+    </section>
+
+    <section class="pane" id="p-sch">
+      <div class="top"><h2>Schedule</h2><span>Your timings for the next three days</span></div>
+      <div class="days" id="days"></div>
+      <div class="card" style="margin-bottom:16px"><div id="evl"></div></div>
+      <form class="card sf" id="sform">
+        <label>Time<input type="time" id="stime" required value="10:00"></label>
+        <label>Meeting<input id="stitle" placeholder="What is it about" required></label>
+        <label>With whom<input id="swith" placeholder="Name or team"></label>
+        <label>Where<select id="swhere"><option>Head office, Chennai</option><option>Video call</option><option>Plant visit</option><option>Travel</option></select></label>
+        <label class="ck"><input type="checkbox" id="spa" checked> Tell my PA about this</label>
+        <button class="btn" type="submit">Add to schedule</button>
+      </form>
+    </section>
+
+    <section class="pane" id="p-pa"><div class="top"><h2>My PA</h2><span>Private chat with your personal assistant</span></div><div id="c-pa"></div></section>
+    <section class="pane" id="p-pl"><div class="top"><h2>Plant heads</h2><span>Message one plant or all six at once</span></div><div id="c-pl"></div></section>
+    <section class="pane" id="p-ho"><div class="top"><h2>Head office, Chennai</h2><span>Tamil Nadu, India · department heads</span></div><div id="c-ho"></div></section>
+
+    <section class="pane" id="p-mail">
+      <div class="top"><h2>Mail</h2><button class="btn" id="newm">New message</button></div>
+      <div class="mail"><nav class="fold" id="fold"></nav><div class="ml" id="ml"></div><div class="rd" id="rd"></div></div>
+    </section>
+
+    <section class="pane" id="p-ops">
+      <div class="top"><h2>Plants</h2><span>Production and status by plant</span></div>
+      <div class="tw"><table><thead><tr><th>Plant</th><th>Location</th><th>Models</th><th>Today / target</th><th>Uptime</th><th>Local time</th><th>Status</th><th></th></tr></thead><tbody id="pt"></tbody></table></div>
+      <div class="top"><h2>Deliveries</h2><span>Cars sent to each market this month</span></div>
+      <div class="tw"><table><thead><tr><th>Country</th><th>Shipped from</th><th>Cars</th><th>Delivered</th><th>Next arrival</th><th>Status</th></tr></thead><tbody id="dt"></tbody></table></div>
+    </section>
+
+    <section class="pane" id="p-sh">
+      <div class="top"><h2>Shareholders</h2><button class="btn" id="shm">Write to shareholders</button></div>
+      <div class="kpis">
+        <div class="kpi"><b>₹1,284</b><span>Share price (sample)</span></div>
+        <div class="kpi"><b>+6.2%</b><span>Revenue growth, quarter</span></div>
+        <div class="kpi"><b>41,200</b><span>Registered shareholders</span></div>
+        <div class="kpi"><b>12 Dec</b><span>Annual general meeting</span></div>
+      </div>
+      <div class="two">
+        <div class="card"><h3>Open investor queries</h3><div id="iq"></div></div>
+        <div class="card"><h3>Before the AGM</h3>
+          <div class="row"><span>Annual report signed off</span><span class="st ok">Done</span></div>
+          <div class="row"><span>Dividend proposal to board</span><span class="st Delay">Pending</span></div>
+          <div class="row"><span>New plant announcement draft</span><span class="st Delay">Pending</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+const $=i=>document.getElementById(i);
+const esc=s=>{const d=document.createElement("div");d.textContent=s;return d.innerHTML};
+const now=()=>new Date().toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",hour12:true});
+const fmt=t=>{const[h,m]=t.split(":").map(Number);return (h%12||12)+":"+String(m).padStart(2,"0")+(h<12?" am":" pm")};
+const dayLabel=o=>{const d=new Date();d.setDate(d.getDate()+o);return d.toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})};
+
+const plants=[
+{n:"Chennai Plant",loc:"Tamil Nadu, India",m:"Hatchbacks, SUVs",a:812,t:900,u:94,s:"Normal",head:"Anita Raman",tz:"Asia/Kolkata"},
+{n:"Pune Plant",loc:"Maharashtra, India",m:"Sedans, Electric",a:640,t:800,u:81,s:"Delay",head:"Vikram Joshi",tz:"Asia/Kolkata"},
+{n:"Sanand Plant",loc:"Gujarat, India",m:"Compact cars",a:705,t:700,u:97,s:"Normal",head:"Dhruv Patel",tz:"Asia/Kolkata"},
+{n:"Detroit Plant",loc:"Michigan, USA",m:"Pickups, SUVs",a:430,t:600,u:68,s:"Alert",head:"James Walker",tz:"America/Detroit"},
+{n:"Stuttgart Plant",loc:"Baden-Württemberg, Germany",m:"Electric, Luxury",a:355,t:380,u:92,s:"Normal",head:"Klara Neumann",tz:"Europe/Berlin"},
+{n:"Rayong Plant",loc:"Rayong, Thailand",m:"Pickups, Compact",a:520,t:560,u:90,s:"Normal",head:"Somchai Prasert",tz:"Asia/Bangkok"}];
+const deliv=[
+{c:"India",f:"Chennai, Pune, Sanand",n:4120,d:3560,e:"Today",s:"Transit"},
+{c:"United States",f:"Detroit",n:980,d:610,e:"24 Nov",s:"Delay"},
+{c:"Germany",f:"Stuttgart",n:720,d:720,e:"Complete",s:"Delivered"},
+{c:"United Arab Emirates",f:"Chennai",n:610,d:340,e:"26 Nov",s:"Transit"},
+{c:"South Africa",f:"Pune",n:450,d:150,e:"02 Dec",s:"Transit"},
+{c:"Australia",f:"Rayong",n:520,d:410,e:"28 Nov",s:"Transit"}];
+const appr=[
+{id:1,t:"Add night shift at Pune plant",d:"Cost ₹3.2 crore per quarter. Requested by Vikram Joshi.",s:null},
+{id:2,t:"Switch Detroit steel supplier",d:"Saves 4% but changes delivery by 5 days.",s:null},
+{id:3,t:"Dealer expansion in Kenya",d:"12 new dealers. Requested by Africa sales head.",s:null}];
+const iq=[["Dividend plan for this year","Meera Kapoor, institutional investor"],["Plans for the Detroit plant","Daniel Cho, fund manager"],["Electric car targets for 2027","Retail shareholders group"]];
+
+/* clocks */
+const myTz=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"Asia/Kolkata"}catch(e){return "Asia/Kolkata"}})();
+const zones=[["You (CEO)",myTz],["Head office, Chennai","Asia/Kolkata"],...plants.map(p=>[p.n.replace(" Plant",""),p.tz])];
+const lt=tz=>{const d=new Date(),f=new Intl.DateTimeFormat("en-IN",{timeZone:tz,hour:"numeric",minute:"2-digit",hour12:true,timeZoneName:"short"}).formatToParts(d),g=t=>(f.find(x=>x.type===t)||{}).value||"";
+  const h=+new Intl.DateTimeFormat("en-GB",{timeZone:tz,hour:"numeric",hourCycle:"h23"}).format(d),open=h>=9&&h<18;
+  return `${g("hour")}:${g("minute")} ${g("dayPeriod").toLowerCase()} ${g("timeZoneName")} <span class="${open?"ok":"bad"}">${open?"office open":"after hours"}</span>`};
+const clocks=()=>{$("clk").innerHTML=zones.map(z=>`<span><b>${z[0]}</b> ${lt(z[1])}</span>`).join("");document.querySelectorAll("[data-tz]").forEach(e=>e.innerHTML=lt(e.dataset.tz))};
+
+/* login */
+$("lform").onsubmit=e=>{e.preventDefault();
+  if($("em").value.trim().toLowerCase()==="ceo@aureliamotors.com"&&$("pw").value.trim()==="ceo@123"){logged=true;$("login").style.display="none";$("app").style.display="grid";init();save()}
+  else $("err").textContent="Email or password is not correct. Use the demo login shown below."};
+$("out").onclick=()=>{logged=false;save();$("app").style.display="none";$("login").style.display="grid";$("err").textContent=""};
+$("theme").onclick=()=>{const r=document.documentElement,d=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"};
+
+/* tabs */
+let curTab="over";
+function go(t){
+  curTab=t;
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===t));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.toggle("on",p.id==="p-"+t));
+  if(cfg[t]){const p=cfg[t].people[cfg[t].sel];p.u=0;draw(t)}
+  badges()}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>go(b.dataset.t));
+
+/* chats: PA, plant heads, head office */
+const R={
+pa:["Yes sir, I will take care of it right away.","Noted sir. I will confirm and keep your schedule updated.","Done sir. Anything else before your next meeting?"],
+pl:["Understood, sir. I will act on this today and update you tonight.","Noted. I will discuss with my team and send a report by evening.","Yes sir, we are on it. Status will reach you after the shift review."],
+ho:["Understood, sir. My team will start on this today.","Noted sir. I will bring this up in today's review and revert.","Yes sir. I will send you a short note before the end of the day."]};
+const hod=[["Suresh Narayanan","Finance, Chief Financial Officer"],["Lakshmi Venkatesh","Human Resources"],["Arvind Kumar","Sales and Marketing"],["Nandini Rao","Quality and Safety"],["Dr. Karthik Rajan","Research and Design"],["Farhan Sheikh","Supply Chain and Logistics"],["Divya Menon","IT and Digital"],["Prakash Iyer","Legal and Compliance"]];
+const mk=(n,r,k,g,tz)=>({n,r,rep:R[k],u:0,th:[],group:g,tz});
+const cfg={
+pa:{sel:0,chips:["Book a meeting","Move my 4:30 pm meeting","Arrange my travel to Detroit","Call me now"],people:[mk("Kavya Subramanian","Personal Assistant to the CEO","pa",0,"Asia/Kolkata")]},
+pl:{sel:0,people:[...plants.map(p=>mk(p.head,p.n+", "+p.loc.split(",")[0],"pl",0,p.tz)),mk("All plant heads","Group message to all 6 plants","pl",1)]},
+ho:{sel:0,people:[...hod.map(d=>mk(d[0],d[1],"ho",0,"Asia/Kolkata")),mk("All department heads","Group message, Head Office Chennai","ho",1)]}};
+cfg.pa.people[0].th.push({f:"",t:"8:45 am",x:"Good morning sir. You have 4 meetings today. The first is at 9:30 am on the Pune battery line. Shall I keep your lunch free?"});cfg.pa.people[0].u=1;
+cfg.pl.people[3].th.push({f:"",t:"8:55 am",x:"Sir, steel supply is still short. Please call me when you are free."});cfg.pl.people[3].u=1;
+cfg.pl.people[1].th.push({f:"",t:"9:20 am",x:"The night shift proposal is in your approvals. It will recover about 160 cars."});cfg.pl.people[1].u=1;
+cfg.ho.people[0].th.push({f:"",t:"8:30 am",x:"Sir, the dividend note for shareholders is ready for your review."});cfg.ho.people[0].u=1;
+
+["pa","pl","ho"].forEach(k=>{
+  $("c-"+k).innerHTML=`<div class="chat"><div class="cl" id="cl-${k}"></div><div class="ct"><div class="ch" id="ch-${k}"></div><div class="cm" id="cm-${k}" aria-live="polite"></div><div class="chips" id="cc-${k}"></div><form class="cf" id="cf-${k}"><textarea id="ci-${k}" rows="1" placeholder="Type a message. Enter to send, Shift+Enter for a new line" aria-label="Message"></textarea><button class="btn" type="submit">Send</button></form></div></div>`;
+  $("cl-"+k).onclick=e=>{const b=e.target.closest(".cp");if(!b)return;cfg[k].sel=+b.dataset.i;cfg[k].people[+b.dataset.i].u=0;draw(k);badges()};
+  const ci=$("ci-"+k),grow=()=>{ci.style.height="auto";ci.style.height=Math.min(ci.scrollHeight,160)+"px"};
+  ci.oninput=grow;
+  ci.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("cf-"+k).requestSubmit()}};
+  $("cf-"+k).onsubmit=e=>{e.preventDefault();const v=ci.value.trim();if(!v)return;ci.value="";grow();send(k,v);ci.focus()};
+  $("cc-"+k).onclick=e=>{const b=e.target.closest(".chip");if(b)send(k,b.textContent)};
+});
+function draw(k){
+  const c=cfg[k],p=c.people[c.sel];
+  $("cl-"+k).innerHTML=c.people.map((q,i)=>`<button class="cp" data-i="${i}" aria-selected="${i===c.sel}"><span><b>${esc(q.n)}</b><small>${esc(q.r)}</small></span>${q.u?`<span class="badge" style="display:inline-block">${q.u}</span>`:""}</button>`).join("");
+  $("ch-"+k).innerHTML=`<b>${esc(p.n)}</b><small>${esc(p.r)}${p.tz?` · local time <span data-tz="${p.tz}"></span>`:""}</small>`;clocks();
+  $("cm-"+k).innerHTML=p.th.length?p.th.map(m=>`<div class="b${m.me?" me":""}">${m.f?`<small>${esc(m.f)}</small>`:""}${esc(m.x)}<small>${m.t}</small></div>`).join(""):`<p class="mt">No messages yet. Write the first one below.</p>`;
+  $("cc-"+k).innerHTML=(c.chips||[]).map(x=>`<button class="chip" type="button">${esc(x)}</button>`).join("");
+  $("cm-"+k).scrollTop=1e6}
+function reply(k,i,x,f){
+  const c=cfg[k],p=c.people[i];p.th.push({f:f||"",t:now(),x});
+  if(!(c.sel===i&&$("p-"+k).classList.contains("on")))p.u++;
+  draw(k);badges()}
+function send(k,text){
+  const c=cfg[k],i=c.sel,p=c.people[i];p.th.push({me:1,t:now(),x:text});
+  const tg=p.group?c.people.filter(q=>!q.group):[p];
+  tg.forEach((q,j)=>setTimeout(()=>{
+    const r=(k==="pa"&&/meeting|schedule|book|move|cancel|travel/i.test(text))?"Understood sir. I will arrange it and add it to your Schedule once it is confirmed.":q.rep[(text.length+j)%q.rep.length];
+    reply(k,i,r,p.group?q.n:"")},1400+j*800));
+  draw(k)}
+
+/* schedule */
+let day=0,eid=10;
+const ev=[
+{id:1,d:0,t:"09:30",x:"Review Pune battery line delay",w:"Vikram Joshi",l:"Video call"},
+{id:2,d:0,t:"11:00",x:"Weekly review with department heads",w:"All department heads",l:"Head office, Chennai"},
+{id:3,d:0,t:"14:30",x:"Prepare shareholder call",w:"Suresh Narayanan",l:"Head office, Chennai"},
+{id:4,d:0,t:"16:30",x:"Detroit steel supplier decision",w:"James Walker",l:"Video call"},
+{id:5,d:1,t:"10:00",x:"Board meeting",w:"Board of directors",l:"Head office, Chennai"},
+{id:6,d:1,t:"15:00",x:"Visit Sanand plant",w:"Dhruv Patel",l:"Plant visit"},
+{id:7,d:2,t:"12:00",x:"Annual general meeting rehearsal",w:"Company secretary",l:"Head office, Chennai"}];
+function sched(){
+  $("days").innerHTML=[0,1,2].map(o=>`<button data-d="${o}" aria-pressed="${o===day}">${o===0?"Today":o===1?"Tomorrow":dayLabel(o)}</button>`).join("");
+  const l=ev.filter(e=>e.d===day).sort((a,b)=>a.t.localeCompare(b.t));
+  $("evl").innerHTML=l.map(e=>`<div class="ev${e.done?" done":""}"><span class="tm">${fmt(e.t)}</span><div class="et"><b>${esc(e.x)}</b><span class="tag">${esc(e.l)}</span><small>With ${esc(e.w||"no one else")}</small></div><span class="acts"><button class="btn g" data-done="${e.id}">${e.done?"Undo":"Done"}</button><button class="btn g" data-del="${e.id}" aria-label="Remove ${esc(e.x)}">Remove</button></span></div>`).join("")||`<p class="mt">Nothing planned for ${day===0?"today":dayLabel(day)}. Add a meeting below.</p>`;
+  $("k3").textContent=ev.filter(e=>e.d===0&&!e.done).length;
+  const n=ev.filter(e=>e.d===0&&!e.done).sort((a,b)=>a.t.localeCompare(b.t)).slice(0,4);
+  $("nx").innerHTML=n.map(e=>`<div class="row"><div><b>${esc(e.x)}</b><small>${esc(e.w)} · ${esc(e.l)}</small></div><b>${fmt(e.t)}</b></div>`).join("")||`<p class="mt">All meetings for today are done.</p>`}
+$("days").onclick=e=>{const b=e.target.closest("button");if(b){day=+b.dataset.d;sched()}};
+$("evl").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.done)ev.forEach(x=>{if(x.id==b.dataset.done)x.done=!x.done});
+  if(b.dataset.del){const i=ev.findIndex(x=>x.id==b.dataset.del);ev.splice(i,1)}
+  sched()};
+$("sform").onsubmit=e=>{e.preventDefault();
+  const x={id:++eid,d:day,t:$("stime").value,x:$("stitle").value.trim(),w:$("swith").value.trim(),l:$("swhere").value};
+  ev.push(x);
+  if($("spa").checked){
+    const p=cfg.pa.people[0];p.th.push({me:1,t:now(),x:`Please note: ${x.x} at ${fmt(x.t)} on ${dayLabel(day)}${x.w?" with "+x.w:""} (${x.l}).`});
+    setTimeout(()=>reply("pa",0,"Noted sir. I have updated your calendar and will inform everyone.","")  ,1500);draw("pa")}
+  $("stitle").value="";$("swith").value="";sched()};
+
+/* overview and tables */
+function over(){
+  $("k1").textContent=plants.reduce((a,p)=>a+p.a,0).toLocaleString("en-IN");
+  $("k4").textContent=appr.filter(a=>!a.s).length;
+  $("appr").innerHTML=appr.map(a=>`<div class="row"><div><b>${esc(a.t)}</b><small>${esc(a.d)}</small></div>${a.s?`<span class="st ${a.s==="Approved"?"ok":"bad"}">${a.s}</span>`:`<span class="acts"><button class="btn" data-a="${a.id}" data-v="Approved">Approve</button><button class="btn g" data-a="${a.id}" data-v="Rejected">Reject</button></span>`}</div>`).join("");
+  $("ob").innerHTML=plants.map(p=>{const pc=Math.min(100,Math.round(p.a/p.t*100));return `<div class="row"><div style="flex:1"><b>${p.n}</b><small>${p.a} of ${p.t} cars</small></div><div class="bar" aria-label="${pc} percent of target"><i style="width:${pc}%"></i></div></div>`}).join("")}
+$("appr").onclick=e=>{const b=e.target.closest("button");if(!b)return;appr.forEach(a=>{if(a.id==+b.dataset.a)a.s=b.dataset.v});over()};
+function tables(){
+  $("pt").innerHTML=plants.map((p,i)=>`<tr><td><b>${p.n}</b><small>Head: ${p.head}</small></td><td>${p.loc}</td><td>${p.m}</td><td>${p.a} / ${p.t}</td><td>${p.u}%</td><td data-tz="${p.tz}"></td><td class="st ${p.s}">${p.s}</td><td><button class="btn g" data-p="${i}">Message head</button></td></tr>`).join("");
+  $("dt").innerHTML=deliv.map(d=>`<tr><td><b>${d.c}</b></td><td>${d.f}</td><td>${d.n.toLocaleString("en-IN")}</td><td>${Math.round(d.d/d.n*100)}%</td><td>${d.e}</td><td class="st ${d.s}">${d.s==="Transit"?"In transit":d.s}</td></tr>`).join("");
+  $("iq").innerHTML=iq.map(q=>`<div class="row"><div><b>${q[0]}</b><small>${q[1]}</small></div></div>`).join("");clocks()}
+$("pt").onclick=e=>{const b=e.target.closest("button");if(b){cfg.pl.sel=+b.dataset.p;go("pl")}};
+$("shm").onclick=()=>compose("Shareholder group");
+
+/* mail: outside parties */
+const contacts={"Meera Kapoor":"Shareholders","Daniel Cho":"Shareholders","Shareholder group":"Shareholders","Fleet Buyers UAE":"Customers","Metro Taxi Group, USA":"Customers","Global Logistics Head":"Suppliers","Steel Supplier, Detroit":"Suppliers"};
+const mails=[
+{id:1,f:"Meera Kapoor",g:"Shareholders",s:"Question on dividend and plant plans",b:"Dear Mr Mehta, investors would like clarity on the dividend and on the Detroit plant before the annual meeting. Could you share a short note?",t:"08:10",u:1,fold:"Inbox"},
+{id:2,f:"Fleet Buyers UAE",g:"Customers",s:"Order of 300 SUVs: delivery date",b:"We placed an order for 300 SUVs. Please confirm the delivery date at Dubai port and the warranty terms for fleet use.",t:"Yesterday",u:1,fold:"Inbox"},
+{id:3,f:"Global Logistics Head",g:"Suppliers",s:"Ship delay to Sydney port",b:"The vessel for Australia is delayed by 3 days because of weather. New arrival is 28 November. Customers will be informed unless you say otherwise.",t:"Mon",u:0,fold:"Inbox"}];
+let nid=100,mfold="Inbox",mgrp="All",msel=1;
+const mbadge=()=>{const n=mails.filter(m=>m.u&&m.fold==="Inbox").length;$("b-mail").textContent=n}
+function renderFold(){
+  $("fold").innerHTML='<h4>Folders</h4>'+["Inbox","Sent"].map(f=>`<button data-f="${f}" aria-pressed="${f===mfold}">${f}</button>`).join("")+'<h4>Groups</h4>'+["All","Shareholders","Customers","Suppliers"].map(g=>`<button data-g="${g}" aria-pressed="${g===mgrp}">${g}</button>`).join("")}
+function mlist(){
+  const ms=mails.filter(m=>m.fold===mfold&&(mgrp==="All"||m.g===mgrp));
+  $("ml").innerHTML=ms.map(m=>`<button class="mi${m.u?" u":""}" data-id="${m.id}" aria-selected="${m.id===msel}"><strong>${esc(mfold==="Sent"?"To: "+m.f:m.f)}</strong><span>${esc(m.s)} · ${m.t}</span></button>`).join("")||'<p class="mt" style="padding:16px">No messages here.</p>'}
+function mread(msg){
+  const m=mails.find(x=>x.id===msel);
+  if(!m){$("rd").innerHTML='<p class="mt">Select a message to read it.</p>';return}
+  $("rd").innerHTML=`<h3>${esc(m.s)}</h3><div class="mt">${m.fold==="Sent"?"To ":"From "}${esc(m.f)} (${m.g}) · ${m.t}</div><p>${esc(m.b)}</p><textarea id="rt" rows="4" aria-label="Your reply" placeholder="Write your reply to ${esc(m.f)}"></textarea><div class="acts"><button class="btn" id="rs">Send reply</button><button class="btn g" id="rf">Forward</button></div><div class="toast" id="tt" role="status">${msg||""}</div>`;
+  $("rs").onclick=()=>{const v=$("rt").value.trim();if(!v){$("tt").style.color="var(--bd)";$("tt").textContent="Write a reply before sending.";return}msend(m.f,"Re: "+m.s,v)};
+  $("rf").onclick=()=>compose("",m.s,m.b)}
+function msend(to,s,b){
+  mails.unshift({id:++nid,f:to,g:contacts[to]||"Customers",s,b,t:"Just now",u:0,fold:"Sent"});
+  setTimeout(()=>{mails.unshift({id:++nid,f:to,g:contacts[to]||"Customers",s:"Re: "+s.replace(/^Re: /,""),b:"Thank you, Mr Mehta. Message received. We will respond in detail within one working day.",t:"Just now",u:1,fold:"Inbox"});mbadge();if(mfold==="Inbox")mlist()},2500);
+  mfold="Sent";mgrp="All";msel=mails[0].id;renderFold();mlist();mread("Message sent to "+to+".");mbadge()}
+function compose(to,s,b){
+  go("mail");
+  const o=Object.keys(contacts).map(k=>`<option${k===to?" selected":""}>${k}</option>`).join("");
+  $("rd").innerHTML=`<h3>New message</h3><div class="cmp"><label>To<select id="ct">${o}</select></label><label>Subject<input id="cs" value="${esc(s||"")}"></label><label>Message<textarea id="cb" rows="7">${esc(b?"\n\n--- Forwarded ---\n"+b:"")}</textarea></label></div><div class="acts"><button class="btn" id="cx">Send</button></div><div class="toast" id="tt" role="status"></div>`;
+  $("cx").onclick=()=>{const s2=$("cs").value.trim(),b2=$("cb").value.trim();if(!s2||!b2){$("tt").style.color="var(--bd)";$("tt").textContent="Add a subject and a message.";return}msend($("ct").value,s2,b2)}}
+$("newm").onclick=()=>compose("");
+$("fold").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.f)mfold=b.dataset.f;if(b.dataset.g)mgrp=b.dataset.g;msel=0;renderFold();mlist();mread()};
+$("ml").onclick=e=>{const b=e.target.closest(".mi");if(!b)return;msel=+b.dataset.id;mails.forEach(m=>{if(m.id===msel)m.u=0});mlist();mread();mbadge();badges()};
+
+function badges(){
+  ["pa","pl","ho"].forEach(k=>$("b-"+k).textContent=cfg[k].people.reduce((a,p)=>a+p.u,0));
+  document.querySelectorAll(".tab .badge").forEach(b=>b.style.display=(+b.textContent>0)?"inline-block":"none")}
+function init(tab){
+  $("date").textContent=new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  clocks();setInterval(clocks,30000);
+  over();tables();sched();["pa","pl","ho"].forEach(draw);renderFold();mlist();mread();mbadge();badges();go(tab||"over")}
+
+/* saving: keeps everything when the page is closed and reopened */
+const KEY="aurelia_portal_v1";
+let logged=false;
+const dnum=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/864e5);
+function save(){try{
+  localStorage.setItem(KEY,JSON.stringify({logged,tab:curTab,theme:document.documentElement.dataset.theme||"",
+   day,eid,ev,appr,nid,mails,mfold,mgrp,msel,dn:dnum(),
+   chats:Object.fromEntries(["pa","pl","ho"].map(k=>[k,{sel:cfg[k].sel,p:cfg[k].people.map(q=>({th:q.th,u:q.u}))}]))}))}catch(e){}}
+function load(){try{
+  const d=JSON.parse(localStorage.getItem(KEY)||"null");if(!d)return null;
+  if(d.theme)document.documentElement.dataset.theme=d.theme;
+  const shift=Math.max(0,dnum()-(d.dn||dnum()));
+  ev.splice(0,ev.length,...d.ev.map(e=>({...e,d:e.d-shift})).filter(e=>e.d>=0));
+  eid=d.eid;day=Math.min(d.day,2);
+  appr.splice(0,appr.length,...d.appr);
+  mails.splice(0,mails.length,...d.mails);nid=d.nid;mfold=d.mfold;mgrp=d.mgrp;msel=d.msel;
+  ["pa","pl","ho"].forEach(k=>{const c=d.chats[k];if(!c)return;cfg[k].sel=Math.min(c.sel,cfg[k].people.length-1);
+    cfg[k].people.forEach((q,i)=>{if(c.p[i]){q.th=c.p[i].th;q.u=c.p[i].u}})});
+  return d}catch(e){return null}}
+window.addEventListener("pagehide",save);window.addEventListener("beforeunload",save);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
+setInterval(save,1500);
+$("reset").onclick=()=>{if(confirm("Reset all messages, meetings and approvals back to the sample data?")){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}};
+const saved=load();
+if(saved&&saved.logged){logged=true;$("login").style.display="none";$("app").style.display="grid";init(saved.tab)}
+</script>
+</body>
+</html>
